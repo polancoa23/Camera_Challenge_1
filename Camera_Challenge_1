@@ -7,11 +7,11 @@ int gcount= 0; // # of times green is seen
 int bcount = 0; // # of times blue is seen
 int count = 0; // # of times no color is seen
 int picture = 0; // # of pictures taken
-int hsecond = 500;
-int tsecond = 100;
-int second = 1000;
-int left = 1000;
-int right = 1900;
+int hsecond = 500; // half second pause
+int tsecond = 100; // 1/10 second pause
+int second = 1000; // second pause
+int left = 1000; // servo position when it's left
+int right = 1900; // servo position when it's right
 
 //
 void red_slow_wave(); // function to perform a slow wave with the servo when red is seen
