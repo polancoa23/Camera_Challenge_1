@@ -1,0 +1,108 @@
+#include <kipr/wombat.h>
+int red = 0; // channel # for color red
+int green = 1; // channel # for color green
+int blue = 2; // channel # for color blue
+int rcount = 0; // # of times red is seen
+int gcount= 0; // # of times green is seen
+int bcount = 0; // # of times blue is seen
+int count = 0; // # of times no color is seen
+int picture = 0; // # of pictures taken
+int hsecond = 500;
+int tsecond = 100;
+int second = 1000;
+int left = 1000;
+int right = 1900;
+
+//
+void red_slow_wave(); // function to perform a slow wave with the servo when red is seen
+void blue_twitchy_wave(); // function to perform a twitchy wave with the servo when blue is seen
+void green_fast_wave(); // function to perform a fast wave with the servo when green is seen
+int main(){
+    enable_servos(); // turns on the servos and allows them to move
+    camera_open_black(); // turns on the camera 
+    msleep(second); // wait a second
+    while(picture <= 500){ // while the robot hasn't taken 500 pictures it will perform the following:
+        camera_update(); // take a picture
+        msleep(tsecond); // pause for 1/10 of a second
+        picture++; // picture count goes up 1
+        /*
+        printf("rcount = %d\n",rcount);
+        printf("gcount = %d\n",gcount);
+        printf("bcount = %d\n",bcount);
+        printf("count = %d\n",count);
+        */
+        
+        if(get_object_count(red) > 0){ // if it sees red it will perform the following:
+            bcount = 0; // blue count resets
+            gcount = 0; // green count resets
+            count = 0; // no color count resets
+            rcount++; // red count goes up 1
+            if(rcount > 19){ // if red count is 20 it will perform the following:
+                rcount = 0; // reset the red count
+                printf("Seeing red!\n"); // print on the screen that it's seeing red
+                red_slow_wave(); // perform the slow wave with the servo
+                msleep(hsecond); // pause for half a second
+            }  
+    	}
+    	else if(get_object_count(green) > 0){ // if it sees green it will perform the following:
+            rcount=0; // red count resets
+            bcount=0; // blue count resets
+            count = 0; // no color count resets
+            gcount++; // green count goes up 1
+            if(gcount > 19){ // if green count is 20 it will perform the following:
+                gcount = 0; // reset the green count
+                printf("Seeing green!\n"); // print on the screen that it's seeing green
+        	      green_fast_wave(); // perform the fast wave with the servo
+                msleep(hsecond); // pause for half a second
+            }
+    	}
+    	else if(get_object_count(blue) > 0){ // if it is seeing blue it will perform the following:
+            gcount = 0; // green count resets
+            rcount = 0; // red count resets
+            count=0; // no color count resets
+            bcount++; // blue count goes up 1
+            if(bcount > 19){ // if blue count is 20 it will perform the following:
+                bcount = 0; // blue count resets
+                printf("Seeing blue!\n"); // print on the screen that it's seeing blue
+        	      blue_twitchy_wave(); // perform the twitchy wave with the servo
+                msleep(hsecond); // pause for half a second
+            }
+    	}
+    	else{ // if it doesn't see red, green, or blue(aka no color) it will perform the following:
+            rcount = 0; // red count resets
+            bcount = 0; // blue count resets
+            gcount = 0; // green count resets
+            count++; // no color count goes up 1
+            if(count > 19){ // if no color count is 20 it will perform the following:
+                count = 0; // no color count resets
+                printf("not seeing any colors\n"); // print on the screen that it's seeing no colors
+                msleep(hsecond); // pause for half a second
+            }	
+    	}
+    }
+    camera_close(); // camera closes
+    disable_servos(); // servos shut down
+    return 0; // exit out main
+}
+void red_slow_wave(){ 
+    set_servo_position(0,left); // waves the servo to the left
+    msleep(second); // pauses for a second
+    set_servo_position(0,right); // waves the servo to the right
+    msleep(second); // pauses for a second
+}
+void green_fast_wave(){
+    set_servo_position(0,left); //waves the servo to the left
+    msleep(hsecond); // pauses for HALF a second
+    set_servo_position(0,right); // waves the servo to the right
+    msleep(hsecond); // pauses for HALF a second
+}
+void blue_twitchy_wave(){
+    set_servo_position(0,left); // waves servo to the left
+    msleep(second); // pauses for a second
+    set_servo_position(0,right); // waves servo to the rigt
+    msleep(tsecond); // pauses for 1/10 of a second
+    set_servo_position(0,left); // waves servo to the left
+    msleep(tsecond); // pauses for 1/10 of a second
+    set_servo_position(0,right); // waves servo to the right
+    msleep(hsecond); // pauses for HALF a second
+}
